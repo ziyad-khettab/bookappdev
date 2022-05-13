@@ -9,6 +9,8 @@ router.route('/')
     .get(bookController.getAllBooks)
     .post(auth, isAdmin, bookController.addBook);
 
+router.route('/readbooks').get(auth, bookController.markedAsRead);
+router.route('/userbooks').get(auth, bookController.getUserBooks);
 router.route('/:bookId')
     .get(bookController.getBook)
     .put(auth, isAdmin, bookController.updateBook)
@@ -29,6 +31,8 @@ router.route('/:bookId/reviews/:reviewId')
     .put(auth, bookController.updateReview)
     .delete(auth, bookController.deleteReview)
 
+
+router.route('/userreviews').get(auth, bookController.getUserReviews)    
 
 
 router.route('/:bookId/read').get(auth, bookController.markAsRead);

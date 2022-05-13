@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -8,6 +8,7 @@ import { Typography } from '@mui/material';
 import Navbar from './Navbar';
 import InputAdornment from '@mui/material/InputAdornment'; 
 import axios from 'axios';
+
 function AddBook(){
     const {user} = useSelector((state) => state.auth);
     const navigate = useNavigate()
@@ -53,6 +54,11 @@ function AddBook(){
             padding : '10px',
             fontSize : '20px',
             borderRadius : '50px'
+        },
+        link : {
+            color : 'white',
+            textDecoration : 'none',
+            fontSize : '14px'
         }
     }
     const [formData, setFormData] = useState({
@@ -93,9 +99,18 @@ function AddBook(){
               }
             await axios.post('/api/v1/books', bookData, config)
             toast("Book added succesfully");
+            setFormData({
+                isbn : "",
+                title : "",
+                author : "",
+                nbPages : "",
+                summary : "",
+                publicationYear : ""
+        
+            })
         }   
         catch(error){
-            toast(error.response.data.msg);
+            console.log(error.response.data.msg);
         }
     }
     return (
@@ -173,7 +188,7 @@ function AddBook(){
                     />
                     <TextField fullWidth 
                         name='summary' 
-                        label='Sypnosis' 
+                        label='Description' 
                         variant ='outlined' 
                         color= 'secondary'
                         required
@@ -211,7 +226,13 @@ function AddBook(){
                             style={styles.submitBtn}
                             type='submit'
                             >Ajouter</Button>
+
                 </form>
+                <Button size="small" variant="contained" color="primary" sx = {styles.submitBtn}>
+                    <Link to={'/googleApi'} style={styles.link}>
+                        Add through google books API
+                    </Link>
+                </Button>
             </div>               
         </div>
     )

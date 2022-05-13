@@ -19,8 +19,8 @@ function Homepage(){
         backgroundColor: '#cccccc',
         height: '100%',     
         backgroundPosition: 'center',
-
-        backgroundSize: 'contain'
+        
+        backgroundSize: 'contain'   
     };
     const container2 = {
         backgroundImage: 'url(/images/bookBAckground.jpg)',
@@ -99,7 +99,7 @@ function Homepage(){
                 });
             })
         }
-    },[books, booksExist,styles.link])
+    },[booksExist])
     function handleChange(event){
         setSearchString(event.target.value)
     }

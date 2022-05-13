@@ -10,6 +10,7 @@ import WriteReview from './components/WriteReview';
 import AddBook from './components/AddBook';
 import NotFound from './components/NotFound';
 import GoogleBooks from './components/GoogleBooks';
+import UpdateReview from './components/UpdateReview';
 function App() {
   return (
     <div className="App">
@@ -21,6 +22,8 @@ function App() {
           <Route exact path='/register' element ={<Register />} />
           <Route exact path='/book/:bookId' element={<Book />} />
           <Route exact path='/review/:bookId' element={<WriteReview />} />
+          <Route exact path='/review/:bookId/update/:reviewId' element={<UpdateReview />} />
+          <Route exact path='/review/:bookId/delete/:reviewId' element={<UpdateReview />} />
           <Route exact path='/addbook' element={<AddBook />} />
           <Route exact path='/googleApi' element={<GoogleBooks />} />
           <Route exact path='*' element={<NotFound />} />

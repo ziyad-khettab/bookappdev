@@ -29,6 +29,38 @@ const getBook = async (req, res) =>{
         res.status(500).json({msg : 'Server error'});
     }
 }
+const getUserBookReview = async (bookId, userId) =>{
+    try{
+        const review = await Book.findOne({_id : bookId, 'reviews.reviewerId' : userId}).select('reviews.$');
+        return review;
+    }
+    catch(err){
+        return null;
+    }
+}
+const getUserBooks = async(req, res) =>{
+    try{
+        let BookAndReview = [];
+        const books = await Book.find({'reviews.reviewerId' : req.user._id});
+        if(books){
+            BookAndReview  = books.map(book =>{
+                let result;
+                let review = getUserBookReview(book._id, req.user._id);
+                review.then(function returnReview(res){
+                    result = {book, review : res}
+                });
+                console.log(review)
+                return result;
+            });
+            return res.status(200).json({books});
+        }
+        return res.status(400).json({msg : 'review not found'});
+    }
+    catch(err){
+        res.status(500).json({msg : err.message});
+    }
+}
+
 const getBookByTitle = async (req, res) =>{
     try{
         const books = await Book.find({title: {$regex: '.*' + req.params.title + '.*', $options:'i'}});
@@ -163,9 +195,9 @@ const getReview = async (req, res) =>{
         if( !req.params.bookId || !req.params.reviewId){
             return res.status(400).json({msg : "Please enter all the information"});
         }
-        const review = await Book.findOne({id : req.params.BookId, 'reviews._id' : req.params.reviewId}, {'reviews.$' : 1});
+        const review = await Book.findOne({'reviews._id' : req.params.reviewId}).select('reviews.$');
         if(review){
-            return res.status(200).json(review);
+            return res.status(200).json(review.reviews[0]);
         }
         return res.status(400).json({msg : 'review not found'});
     }
@@ -173,6 +205,15 @@ const getReview = async (req, res) =>{
         res.status(500).json({msg : error.message});
     }
 }
+const getUserReviews = async(req, res) =>{
+    try{
+
+    }
+    catch(error){
+        res.status(500).json({msg : error.message})
+    }
+}
+
 const addReview = async (req, res) =>{
     try{
         if(!req.user.id || !req.body.text){
@@ -353,6 +394,21 @@ const hasRead = async (req, res) =>{
         res.status(500).json({msg : error.message})
     }
 }
+
+const markedAsRead = async (req, res) =>{
+    try{
+        const read = await Book.find({ readBy : {$elemMatch : {readById : req.user.id}}});
+        if(read){
+            return res.status(200).json({read})
+        }
+        else{
+            return res.status(404).json({msg : 'No books found'});
+            }
+    }
+    catch(error){
+        res.status(500).json({msg : error.message})
+    }
+}
 module.exports = {
     getAllBooks,
     getBook,
@@ -369,5 +425,7 @@ module.exports = {
     VoteReview,
     markAsRead,
     hasRead,
-    
+    getUserReviews,
+    getUserBooks,
+    markedAsRead,
 }

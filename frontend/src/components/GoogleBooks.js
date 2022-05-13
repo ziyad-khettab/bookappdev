@@ -4,8 +4,49 @@ import {useState, useEffect} from 'react';
 import axios from 'axios';
 import {useSelector} from 'react-redux';   
 import {useNavigate} from 'react-router-dom';
+import Navbar from './Navbar';
+import { Typography } from '@mui/material';
+import {toast} from 'react-toastify';
 function GoogleBooks(){
-    
+    const styles = {
+        page : {
+            backgroundColor : '#B3D6CD',   
+            height : '100vh',
+            backgroundImage: 'url(/images/bg.jpg)',
+            backgroundRepeat : 'no-repeat',
+            backgroundPosition : 'center',
+            backgroundSize : 'cover'
+            
+        },
+        /*  'linear-gradient(to right, #B3D6CD, #BEEBFA)' */
+        container : {
+            backgroundColor : '#FBF4FF',
+            maxWidth : '500px',
+            margin : '60px auto',
+            borderRadius : '10px',
+            padding : '30px 30px 10px 30px',
+            display : 'flex',
+            flexDirection : 'column',
+            textAlign : 'center',
+            boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px'
+        },
+        title : {
+            fontSize : '25px'
+        },
+        form :{
+            display : 'flex',
+            flexDirection : 'column',
+            alignItems : 'center',
+            gap : '30px',
+            padding : '50px 0px',
+        },
+        loginBtn :{
+            marginTop : '20px',
+            padding : '10px',
+            fontSize : '20px',
+            borderRadius : '50px'
+        }
+    }
     const {user} = useSelector((state) => state.auth);
     const navigate = useNavigate()
     useEffect(()=>{
@@ -64,38 +105,57 @@ function GoogleBooks(){
                         photo : `${imageExists ? book.volumeInfo.imageLinks.thumbnail : defaultPhoto}`
                     }  
                     addBook(bookData);
+                    
+                    
                     return bookData;
                 })
-            
+                toast("Books added succesfully");
+                setFormData({
+                    authorFirstName : "",
+                    authorLastName : "",
+                })
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                toast("Books added succesfully");
+                console.log(err)}
+                );
+            
     }
     return (
-        <form onSubmit={handleSubmit}>
-            <TextField  
-                            onChange={handleChange} 
-                            name='authorFirstName' label='Author firstname' 
-                            variant='outlined' 
-                            value={formData.authorFirstName}   
-                            color='secondary'
-                 
- 
-                    />
+        <div style = {styles.page}>
+            <Navbar />  
+            <div style={styles.container}>
+                <Typography 
+                        style={styles.title}
+                        >Add books by author</Typography>
+                <form onSubmit={handleSubmit} style={styles.form}>
                     <TextField  
-                            onChange ={handleChange} 
-                            name='authorLastName' 
-                            label='author lastName' 
-                            variant ='outlined' 
-                            value={formData.authorLastName} 
-                            color= 'secondary'
-                    
-                    />
-                    <Button variant='contained' 
-                            label='submit' 
-    
-                            type='submit'
-                            >Add books</Button>
-        </form>
+                                    onChange={handleChange} 
+                                    name='authorFirstName' label='Author firstname' 
+                                    variant='outlined' 
+                                    value={formData.authorFirstName}   
+                                    color='secondary'
+                                    fullWidth
+        
+                            />
+                            <TextField  
+                                    onChange ={handleChange} 
+                                    name='authorLastName' 
+                                    label='author lastname' 
+                                    variant ='outlined' 
+                                    value={formData.authorLastName} 
+                                    color= 'secondary'
+                                    fullWidth
+                            />
+                            <Button variant='contained' 
+                                    label='submit' 
+                                    
+                                    type='submit'
+                                    >Add books</Button>
+                </form>
+                </div>
+            
+            </div>
     )
 }
 export default GoogleBooks;

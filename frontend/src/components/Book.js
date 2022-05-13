@@ -17,7 +17,7 @@ function Book(){
             height: '100%',     
             backgroundPosition: 'center',
             backgroundSize: '',
-            
+
         },
         book : {
             display : 'flex',
@@ -117,7 +117,7 @@ function Book(){
             .catch(err =>{ 
                 console.error(err)});
         }
-    }, [user, navigate,bookId])
+    }, [user, navigate,bookId, book])
     let reviews;
     if(!isLoading ){
         reviews = book.reviews.map(review => 

@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import Navbar from './Navbar';
 import Box from '@mui/material/Box';
@@ -7,12 +7,14 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
+import axios from 'axios';
+import BookCard from './BookCard';
 
 function Profile(){
     const styles = {
         page : {
             backgroundColor : '#B3D6CD',   
-            height : '100vh',
+            height : '100%',
             backgroundImage: 'url(/images/bg.jpg)',
             backgroundRepeat : 'no-repeat',
             backgroundPosition : 'center',
@@ -41,17 +43,59 @@ function Profile(){
             fontSize : '60px', 
             textAlign : 'center', 
             margin : '0px auto 20px auto',
-         }
+         },
+        bookGrid : {
+            marginTop : "50px",
+            display : 'flex',
+            flexWrap : 'wrap',
+            justifyContent : 'space-around'
+        },
+        link : {
+            textDecoration : 'none'
+        }
     }
+    const [myBooks, setMyBooks] = useState(null);
+    const [booksExist, setBooksExist] = useState(false);
+    const [bookCards, setBookCards] = useState(null);
     const {user} = useSelector((state) => state.auth);
     const navigate = useNavigate();
     const [avatar, setAvatar ] = useState('');
     useEffect( ()=>{
+
         if(!user){
             navigate('/login')
         }
       setAvatar(user.username ? user.username.charAt(0) : 'H');
-    }, [user, navigate])    
+      const items = JSON.parse(localStorage.getItem('user'));
+            const token = items.token;
+            const config = {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+      axios.get(`/api/v1/books/readbooks`, config)
+
+        .then(res => {
+            if(res.data.read.length > 0){
+                setBooksExist(true); 
+                setMyBooks(res.data.read); 
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            setMyBooks(null);
+            setBooksExist(false);
+        });
+        if(booksExist){
+            setBookCards(prevState =>{
+                return myBooks.map(book => {
+                    let linkString = `/book/${book._id}`;
+                    return  <Link to={linkString}  style={styles.link}><BookCard key={book._id} book={book}/></Link>
+                });
+            })
+        }
+
+    }, [user, navigate, booksExist, myBooks])    
     return (
             <div style = {styles.page}>
                 <Navbar />  
@@ -78,8 +122,21 @@ function Profile(){
                         </Box>
                     </CardContent>   
                     </Card> 
+                    
                 }
-            
+                <Typography variant='h2' sx={{ lineHeight: '2', margin : '20px auto', width : '500px', textAlign : 'center', color : '#fff' }}>    
+                        Finished books
+                </Typography>
+                {
+                    booksExist ? 
+                    <div style={styles.bookGrid}>
+                        {bookCards}
+                    </div>
+                    : 
+                    <Typography variant='h4' sx={{  lineHeight: '2', margin : '0px auto' , textAlign : 'center',     paddingBottom : '40px', width : '300px', color : '#fff' }}>    
+                        No Books Found
+                    </Typography>
+                }
         </div>    
     )
 }
